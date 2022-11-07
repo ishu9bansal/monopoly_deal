@@ -1,0 +1,22 @@
+.perspective_container {
+	perspective: 1000px;
+}
+.cube {
+  width: 30vh;
+  height: 30vh;
+  margin: 20vh auto;
+  transform-style: preserve-3d;
+  transform-origin: 15vh 15vh 0
+  /*transform: rotateX(-45deg) rotateY(30deg);*/
+}
+
+.side {
+  position: absolute;
+}
+
+.front {transform: translateZ(15vh);}
+.top {transform: rotateX(90deg) translateZ(15vh);}
+.right {transform: rotateY(90deg) translateZ(15vh);}
+.left {transform: rotateY(-90deg) translateZ(15vh);}
+.bottom {transform: rotateX(-90deg) translateZ(15vh);}
+.back {transform: rotateY(-180deg) translateZ(15vh);}
