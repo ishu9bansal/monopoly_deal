@@ -43,7 +43,8 @@ class Game {
 	}
 
 	showPrompt(){
-		console.log(this.prompt);
+		showGamePrompt(this.prompt);
+		this.renderHandPile(this.promtPlayer);
 	}
 
 	pop(l){
@@ -63,7 +64,7 @@ class Game {
 		return function(){
 			let l = that.players[i].handPile.length != 0 ? 2 : 5;
 			let cards = that.pop(l);
-			console.log("Draw",l,"cards for player",i);
+			showGameMessage("Draw " + l + " cards for player " + i)
 			cards.forEach(c => that.players[i].handPile.push(c));
 			that.actionStack.push(that.endTurn(i));
 			that.actionStack.push(that.playHand(i));
@@ -77,7 +78,7 @@ class Game {
 		let that = this;
 		return function(){
 			that.actionStack.push(that.startTurn((i+1)%(that.numberOfPlayers)));
-			console.log("Checking if any card needs to dismiss for player ",i);
+			showGameMessage("Checking if any card needs to dismiss for player " + i);
 			let c = that.players[i].handPile.length - 7;
 			if(c > 0)
 				while(n--)	
@@ -86,10 +87,11 @@ class Game {
 		}
 	}
 
-	playerActionHelper(prompt, playerAction){
+	playerActionHelper(prompt, playerAction, player){
 		let that = this;
 		return function(){
 			that.prompt = prompt;
+			that.promtPlayer = player;
 			that.actionStack.push(that.playerResponseHelper(playerAction));
 			that.showPrompt();
 		}
@@ -101,10 +103,10 @@ class Game {
 			console.log("Player responded with args", args);
 			let response = playerAction(...args);
 			if(response.length){	// means error, recur same method
-				console.log(response);
-				that.actionStack.push(that.playerActionHelper(that.prompt,playerAction));
+				showGamePrompt(response);
+				that.actionStack.push(that.playerActionHelper(that.prompt,playerAction,that.promtPlayer));
 			}else{
-				console.log("game progressed after user move");
+				showGameMessage("game progressed after user move");
 				that.prompt = GAME_IN_PROGRESS;
 			}
 			that.next();
@@ -113,39 +115,41 @@ class Game {
 
 	dismissCard(i){
 		let that = this;
+		let msg = "Player " + i + " has to DISCARD a card.\n"
+		msg += "Please respond a number i.e. the index of the card you want to DISCARD from your hand."
 		return this.playerActionHelper(
-			"Player " + i + " has to DISCARD a card.\n\
-			Please respond a number i.e. the index of the card you want to DISCARD from your hand.\n\
-			Enter... game.next(0) if you want to DISCARD the 0th card.",
+			msg,
 			function(card){
 				if(!Number.isInteger(card) || card >= that.players[i].handPile.length){
 					return "invalid card provided. Choose an integer from 0 to " + that.players[i].handPile.length;
 				}
-				console.log("Moving card", cardValue, "to discard pile from player ",i);
+				showGameMessage("Moving card" +  cardValue +  "to discard pile from player " + i);
 				let cardValue = that.players[i].handPile[card];
 				that.players[i].handPile.splice(card,1);
 				that.openPile.push(cardValue);
 				return "";
-			}
+			},
+			i
 		);
 	}
 
 	playHand(i){
 		let that = this;
+		let msg = "Player " + i + " has to play a card.\n"
+		msg += "Please respond a number i.e. the index of the card you want to play from your hand."
 		return this.playerActionHelper(
-			"Player " + i + " has to play a card.\n\
-			Please respond a number i.e. the index of the card you want to play from your hand.\n\
-			Enter... game.next(0) if you want to play the 0th card.",
+			msg,
 			function(l){
 				if(!Number.isInteger(l) || l >= that.players[i].handPile.length){
 					return "invalid card provided. Choose an integer from 0 to " + that.players[i].handPile.length;
 				}
 				let card = that.players[i].handPile[l];
-				console.log("Player",i,"is playing card", card);
+				showGameMessage("Player " + i + " is playing card " +  card);
 				that.players[i].handPile.splice(l,1);
 				that.actionStack.push(that.playCard(i,card));
 				return "";
-			}
+			},
+			i
 		);
 	}
 
@@ -175,17 +179,18 @@ class Game {
 				if(!Number.isInteger(l) || l >= allowedActions.length){
 					return "invalid operation. Choose an integer from 0 to " + allowedActions.length;
 				}
-				console.log("Player ",i,"chose: ", allowedActions[l].message);
+				showGameMessage("Player " + i + " chose: " +  allowedActions[l].message);
 				that.actionStack.push(allowedActions[l].action);
 				return "";
-			}
+			},
+			i
 		);
 	}
 
 	showCard(i,card){
 		let that = this;
 		return function(){
-			console.log("Moving card",card,"to player", i, "show pile.");
+			showGameMessage("Moving card " + card + " to player " +  i +  " show pile.");
 			that.players[i].showPile.push(card);
 			that.next();
 		}
@@ -204,6 +209,11 @@ class Game {
 		}
 		console.log(this.players[player].handPile);
 	}
+
+	renderHandPile(player){
+		var nodes = this.players[player].handPile.map((val,ind) => createHandCard(val.toString(),ind.toString()));
+		handCards.replaceChildren(...nodes);
+	}
 }
 
 function shuffle(array){
@@ -217,3 +227,77 @@ function shuffle(array){
 	}
 	return array;
 }
+
+var game = null;
+
+var userInput = document.getElementById("userInput");
+var messageBoard = document.getElementById("messageBoard");
+var handCards = document.getElementById("handCards");
+
+var addMessageToBoard = function(messageNode){
+	messageBoard.appendChild(messageNode);
+	messageBoard.appendChild(document.createElement('br'));
+	messageBoard.scrollTop = messageBoard.scrollHeight;
+}
+
+var showGamePrompt = function(text){
+	addMessageToBoard(createGamePrompt(text));
+}
+
+var showGameMessage = function(text){
+	addMessageToBoard(createGameMessage(text));
+}
+
+var handleUserInput = function(text){
+	addMessageToBoard(createPlayerMessage(text));
+	var num = parseInt(text);
+	if(!Number.isInteger(num))	return;
+	if(!game){
+		game = new Game(num);
+		return;
+	}
+	game.next(num);
+}
+
+function createMessageCard(cardClassName, text){
+	var cardContent = document.createElement('div');
+	cardContent.className = 'card-body';
+	cardContent.innerText = text;
+	var card = document.createElement('div');
+	card.className = cardClassName;
+	card.appendChild(cardContent);
+	return card;
+}
+
+function createHandCard(text, ind){
+	var cardValue = document.createElement('div');
+	cardValue.className = 'hand-card-value';
+	cardValue.innerText = text;
+	var cardIndex = document.createElement('div');
+	cardIndex.className = 'hand-card-index';
+	cardIndex.innerText = ind.toString();
+	var card = document.createElement('div');
+	card.className = 'hand-card';
+	card.appendChild(cardValue);
+	card.appendChild(cardIndex);
+	return card;
+}
+
+function createGameMessage(text){
+	return createMessageCard('card bg-info text-white', text);
+}
+
+function createGamePrompt(text){
+	return createMessageCard('card bg-primary text-white', text);
+}
+
+function createPlayerMessage(text){
+	return createMessageCard('card', text);
+}
+
+userInput.addEventListener("keypress", function(event) {
+  if (event.key === "Enter") {
+    handleUserInput(userInput.value);
+    userInput.value = "";
+  }
+});
