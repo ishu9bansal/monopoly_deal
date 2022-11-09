@@ -12,33 +12,66 @@
 <body>
   <div class="container mt-3">
     <div class="row h-75">
-      <div id="messageBoard" class="h-100 overflow-auto">
-        <div class="card bg-info text-white">
-          <div class="card-body">Let's start Monopoly Deal!</div>
+      <div class="col-sm-6">
+        <div class="monopoly-view-cards" id="viewCards">
+          <!-- <div class="player-view-cards">
+            <div class="empty-card"></div>
+            <div class="empty-card"></div>
+            <div class="empty-card"></div>
+            <div class="empty-card"></div>
+            <div class="empty-card"></div>
+            <div class="view-card">37</div>
+            <div class="view-card">42</div>
+            <div class="view-card">67</div>
+            <div class="view-card">31</div>
+            <div class="view-card">95</div>
+            <div class="player">Player 0</div>
+          </div>
+          <div class="player-view-cards">
+            <div class="empty-card"></div>
+            <div class="empty-card"></div>
+            <div class="empty-card"></div>
+            <div class="empty-card"></div>
+            <div class="empty-card"></div>
+            <div class="view-card">37</div>
+            <div class="view-card">42</div>
+            <div class="view-card">67</div>
+            <div class="view-card">31</div>
+            <div class="view-card">95</div>
+            <div class="player">Player 1</div>
+          </div> -->
+        </div>
+        <div class="monopoly-hand-cards" id="handCards">
+          <!-- <div class="hand-card">
+            <div class="hand-card-value">Deal Breaker</div>
+            <div class="hand-card-index">0</div>
+          </div>
+          
+          <div class="hand-card">
+            <div class="hand-card-value">No Card</div>
+            <div class="hand-card-index">1</div>
+          </div> -->
+        </div>
+      </div>
+      <div class="col-sm-6">
+        <div class="row h-100">
+          <div id="messageBoard" class="h-100 overflow-auto">
+            <div class="card bg-info text-white">
+              <div class="card-body">Let's start Monopoly Deal!</div>
+            </div>
+            <br>
+            <div class="card bg-primary text-white">
+              <div class="card-body">Input the number of players</div>
+            </div>
+            <br>
+          </div>
         </div>
         <br>
-        <div class="card bg-primary text-white">
-          <div class="card-body">Input the number of players</div>
+        <div class="row">
+          <input id="userInput" type="text" class="form-control" placeholder="Enter your response here!">
         </div>
-        <br>
       </div>
-    </div>
-    <br>
-    <div class="row">
-      <input id="userInput" type="text" class="form-control" placeholder="Enter your response here!">
-    </div>
-    <br>
-    <div class="monopoly-hand-cards" id="handCards">
-      <!-- <div class="hand-card">
-        <div class="hand-card-value">Deal Breaker</div>
-        <div class="hand-card-index">0</div>
-      </div>
-      
-      <div class="hand-card">
-        <div class="hand-card-value">No Card</div>
-        <div class="hand-card-index">1</div>
-      </div> -->
-    </div>
+    </div>    
   </div>
   
   <script type="text/javascript" src="index.js"></script>

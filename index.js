@@ -33,6 +33,7 @@ class Game {
 			// TODO: add constraints on n
 			this.players.push(new Player(this.pop(5)));
 		}
+		this.refreshView();
 		this.actionStack = [this.startTurn(0)];
 		this.prompt = GAME_IN_PROGRESS;
 		this.next();
@@ -40,6 +41,10 @@ class Game {
 
 	next(...args){
 		this.actionStack.pop()(...args);
+	}
+
+	refreshView(){
+		refreshViewCards(this.players);
 	}
 
 	showPrompt(){
@@ -192,6 +197,7 @@ class Game {
 		return function(){
 			showGameMessage("Moving card " + card + " to player " +  i +  " show pile.");
 			that.players[i].showPile.push(card);
+			that.refreshView();
 			that.next();
 		}
 	}
@@ -233,6 +239,7 @@ var game = null;
 var userInput = document.getElementById("userInput");
 var messageBoard = document.getElementById("messageBoard");
 var handCards = document.getElementById("handCards");
+var viewCards = document.getElementById("viewCards");
 
 var addMessageToBoard = function(messageNode){
 	messageBoard.appendChild(messageNode);
@@ -280,6 +287,40 @@ function createHandCard(text, ind){
 	card.className = 'hand-card';
 	card.appendChild(cardValue);
 	card.appendChild(cardIndex);
+	return card;
+}
+
+function refreshViewCards(players){
+	var nodes = players.map((p,i) => createPlayerViewCards("Player "+i, p.showPile));
+	viewCards.replaceChildren(...nodes);
+}
+
+function createPlayerViewCards(playerName,cards){
+	var player = document.createElement('div');
+	player.className = 'player';
+	player.innerText = playerName;
+	var l = 10 - cards.length;
+	if(l<0)	l = 0;
+	var nodes = [];
+	while(l--)	nodes.push(createEmptyViewCard());
+	cards.forEach(c => nodes.push(createViewCard(c.toString())));
+	nodes.push(player);
+	var playerPile = document.createElement('div');
+	playerPile.className = 'player-view-cards';
+	playerPile.replaceChildren(...nodes);
+	return playerPile;
+}
+
+function createViewCard(text){
+	var card = document.createElement('div');
+	card.className = 'view-card';
+	card.innerText = text;
+	return card;
+}
+
+function createEmptyViewCard(){
+	var card = document.createElement('div');
+	card.className = 'empty-card';
 	return card;
 }
 

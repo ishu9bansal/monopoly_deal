@@ -2,11 +2,11 @@
   color: white;
   background: blue;
   border-radius: 5px;
-  display: inline-flex;
-  align-items: unset;
+  display: inline-block;
+  align-items: center;
   margin: 10px;
-  height: 100px;
-  width: 60px;
+  height: 82px;
+  width: 50px;
 }
 
 .monopoly-hand-cards .hand-card-value{
@@ -15,8 +15,52 @@
 
 .monopoly-hand-cards .hand-card-index{
   margin: 10px;
+  float: right;
 }
 
 .monopoly-hand-cards:hover .hand-card-value{
   color: inherit;
+}
+
+.monopoly-hand-cards{
+  display: inline-block;
+}
+
+.player-view-cards{
+  display: inline-block;
+  float: right;
+}
+
+.monopoly-view-cards .player{
+  color: white;
+  background: royalblue;
+  border-radius: 2.5px;
+  display: inline;
+  float: right;
+  margin: 15px;
+  text-align: center;
+}
+
+.monopoly-view-cards .view-card{
+  color: white;
+  background: grey;
+  border-radius: 2.5px;
+  display: inline-block;
+  float: right;
+  margin: 5px;
+  height: 41px;
+  width: 25px;
+}
+
+.monopoly-view-cards .empty-card{
+  color: white;
+  border-radius: 2.5px;
+  border: grey;
+  border-width: 1;
+  border-style: solid;
+  display: inline-block;
+  float: right;
+  margin: 5px;
+  height: 41px;
+  width: 25px;
 }
