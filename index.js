@@ -86,7 +86,7 @@ class Game {
 			showGameMessage("Checking if any card needs to dismiss for player " + i);
 			let c = that.players[i].handPile.length - 7;
 			if(c > 0)
-				while(n--)	
+				while(c--)	
 					that.actionStack.push(that.dismissCard(i));
 			that.next();
 		}
@@ -125,12 +125,12 @@ class Game {
 		return this.playerActionHelper(
 			msg,
 			function(card){
-				if(!Number.isInteger(card) || card >= that.players[i].handPile.length){
+				if(!Number.isInteger(card) || card > that.players[i].handPile.length || card <= 0){
 					return "invalid card provided. Choose an integer from 0 to " + that.players[i].handPile.length;
 				}
+				let cardValue = that.players[i].handPile[card-1];
 				showGameMessage("Moving card" +  cardValue +  "to discard pile from player " + i);
-				let cardValue = that.players[i].handPile[card];
-				that.players[i].handPile.splice(card,1);
+				that.players[i].handPile.splice(card-1,1);
 				that.openPile.push(cardValue);
 				return "";
 			},
@@ -140,17 +140,22 @@ class Game {
 
 	playHand(i){
 		let that = this;
-		let msg = "Player " + i + " has to play a card.\n"
-		msg += "Please respond a number i.e. the index of the card you want to play from your hand."
+		let msg = "Player " + i + " has to play a card.\n";
+		msg += "Please respond a number i.e. the index of the card you want to play from your hand.\n";
+		msg += "Or respond with 0 if you want to skip";
 		return this.playerActionHelper(
 			msg,
 			function(l){
-				if(!Number.isInteger(l) || l >= that.players[i].handPile.length){
+				if(!Number.isInteger(l) || l > that.players[i].handPile.length || l < 0){
 					return "invalid card provided. Choose an integer from 0 to " + that.players[i].handPile.length;
 				}
-				let card = that.players[i].handPile[l];
+				if(l==0){
+					showGameMessage("Player " + i + " skipped one turn.");
+					return "";
+				}
+				let card = that.players[i].handPile[l-1];
 				showGameMessage("Player " + i + " is playing card " +  card);
-				that.players[i].handPile.splice(l,1);
+				that.players[i].handPile.splice(l-1,1);
 				that.actionStack.push(that.playCard(i,card));
 				return "";
 			},
@@ -181,7 +186,7 @@ class Game {
 		let that = this;
 		return allowedActions.length == 1 ? allowedActions[0].action : this.playerActionHelper(msg,
 			function(l){
-				if(!Number.isInteger(l) || l >= allowedActions.length){
+				if(!Number.isInteger(l) || l >= allowedActions.length || l < 0){
 					return "invalid operation. Choose an integer from 0 to " + allowedActions.length;
 				}
 				showGameMessage("Player " + i + " chose: " +  allowedActions[l].message);
@@ -203,21 +208,21 @@ class Game {
 	}
 
 	viewShowPile(player){
-		if(!Number.isInteger(player) || player >= this.numberOfPlayers){
+		if(!Number.isInteger(player) || player >= this.numberOfPlayers || player < 0){
 			return "invalid player. Choose an integer from 0 to " + this.numberOfPlayers;
 		}
 		console.log(this.players[player].showPile);
 	}
 
 	viewHandPile(player){
-		if(!Number.isInteger(player) || player >= this.numberOfPlayers){
+		if(!Number.isInteger(player) || player >= this.numberOfPlayers || player < 0){
 			return "invalid player. Choose an integer from 0 to " + this.numberOfPlayers;
 		}
 		console.log(this.players[player].handPile);
 	}
 
 	renderHandPile(player){
-		var nodes = this.players[player].handPile.map((val,ind) => createHandCard(val.toString(),ind.toString()));
+		var nodes = this.players[player].handPile.map((val,ind) => createHandCard(val.toString(),(++ind).toString()));
 		handCards.replaceChildren(...nodes);
 	}
 }
