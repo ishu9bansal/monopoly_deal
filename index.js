@@ -56,9 +56,9 @@ class Game {
 		let that = this;
 		return function(){
 			let l = that.players[i].handPile.length != 0 ? 2 : 5;
-			let cards = that.pop(l);
+			let popedCards = that.pop(l);
 			showGameMessage("Draw " + l + " cards for player " + i)
-			cards.forEach(c => that.players[i].handPile.push(c));
+			popedCards.forEach(c => that.players[i].handPile.push(c));
 			that.actionStack.push(that.endTurn(i));
 			that.actionStack.push(that.playHand(i));
 			that.actionStack.push(that.playHand(i));
@@ -159,7 +159,7 @@ class Game {
 		});
 		if(cards[card].prompt){
 			allowedActions.push({
-				message: cards[card].promt,
+				message: cards[card].prompt,
 				action: this.useCard(i,card)
 			});
 		}
@@ -190,6 +190,17 @@ class Game {
 		return function(){
 			showGameMessage("Moving card " + card + " to player " +  i +  " show pile.");
 			that.players[i].showPile.push(card);
+			that.refreshView();
+			that.next();
+		}
+	}
+
+	useCard(i,card){
+		let that = this;
+		return function(){
+			// TODO: add card function here
+			showGameMessage("Moving card " + card + " to discard pile.");
+			that.openPile.push(card);
 			that.refreshView();
 			that.next();
 		}
@@ -288,15 +299,15 @@ function refreshViewCards(players){
 	viewCards.replaceChildren(...nodes);
 }
 
-function createPlayerViewCards(playerName,cards){
+function createPlayerViewCards(playerName, viewCards){
 	var player = document.createElement('div');
 	player.className = 'player';
 	player.innerText = playerName;
-	var l = 10 - cards.length;
+	var l = 10 - viewCards.length;
 	if(l<0)	l = 0;
 	var nodes = [];
 	while(l--)	nodes.push(createEmptyViewCard());
-	cards.forEach(c => nodes.push(createViewCard(cards[c].label)));
+	viewCards.forEach(c => nodes.push(createViewCard(cards[c].label)));
 	nodes.push(player);
 	var playerPile = document.createElement('div');
 	playerPile.className = 'player-view-cards';
