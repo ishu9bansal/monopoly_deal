@@ -116,10 +116,10 @@ class Game {
 				if(!Number.isInteger(card) || card > that.players[i].handPile.length || card <= 0){
 					return "invalid card provided. Choose an integer from 0 to " + that.players[i].handPile.length;
 				}
-				let cardValue = that.players[i].handPile[card-1];
-				showGameMessage("Moving card" +  cardValue +  "to discard pile from player " + i);
+				let cardId = that.players[i].handPile[card-1];
+				showGameMessage("Moving card " +  cards[cardId].label +  " to discard pile from player " + i);
 				that.players[i].handPile.splice(card-1,1);
-				that.openPile.push(cardValue);
+				that.openPile.push(cardId);
 				return "";
 			},
 			i
@@ -142,7 +142,7 @@ class Game {
 					return "";
 				}
 				let card = that.players[i].handPile[l-1];
-				showGameMessage("Player " + i + " is playing card " +  card);
+				showGameMessage("Player " + i + " is playing card " +  cards[card].label);
 				that.players[i].handPile.splice(l-1,1);
 				that.actionStack.push(that.playCard(i,card));
 				return "";
@@ -188,7 +188,7 @@ class Game {
 	showCard(i,card){
 		let that = this;
 		return function(){
-			showGameMessage("Moving card " + card + " to player " +  i +  " show pile.");
+			showGameMessage("Moving card " + cards[card].label + " to player " +  i +  " show pile.");
 			that.players[i].showPile.push(card);
 			that.refreshView();
 			that.next();
@@ -199,7 +199,7 @@ class Game {
 		let that = this;
 		return function(){
 			// TODO: add card function here
-			showGameMessage("Moving card " + card + " to discard pile.");
+			showGameMessage("Moving card " + cards[card].label + " to discard pile.");
 			that.openPile.push(card);
 			that.refreshView();
 			that.next();
