@@ -8,25 +8,13 @@ class Player{
 
 const GAME_IN_PROGRESS = "Game in progress";
 
-const CARDS = [
-{},{},{},{},{},
-{},{},{},{},{},
-{},{},{},{},{},
-{},{},{},{},{},
-{},{},{},{},{},
-{},{},{},{},{},
-{},{},{},{},{},
-{},{},{},{},{},
-{},{},{},{},{},
-{},{},{},{},{},
-];
 class Game {
 	constructor(numberOfPlayers){
 		this.numberOfPlayers = numberOfPlayers;
 		this.openPile = [];
 		this.closedPile = [];
 		this.players = []
-		let i = CARDS.length;
+		let i = cards.length;
 		while(i--)	this.closedPile.push(i);
 		shuffle(this.closedPile);
 		for(let i=0; i<this.numberOfPlayers; i++){
@@ -169,9 +157,9 @@ class Game {
 			message: "Move to show pile.",
 			action: this.showCard(i,card)
 		});
-		if(card.actionPrompt){
+		if(cards[card].prompt){
 			allowedActions.push({
-				message: card.actionPrompt,
+				message: cards[card].promt,
 				action: this.useCard(i,card)
 			});
 		}
@@ -222,7 +210,7 @@ class Game {
 	}
 
 	renderHandPile(player){
-		var nodes = this.players[player].handPile.map((val,ind) => createHandCard(val.toString(),(++ind).toString()));
+		var nodes = this.players[player].handPile.map((val,ind) => createHandCard(cards[val].label,(++ind).toString()));
 		handCards.replaceChildren(...nodes);
 	}
 }
@@ -308,7 +296,7 @@ function createPlayerViewCards(playerName,cards){
 	if(l<0)	l = 0;
 	var nodes = [];
 	while(l--)	nodes.push(createEmptyViewCard());
-	cards.forEach(c => nodes.push(createViewCard(c.toString())));
+	cards.forEach(c => nodes.push(createViewCard(cards[c].label)));
 	nodes.push(player);
 	var playerPile = document.createElement('div');
 	playerPile.className = 'player-view-cards';
